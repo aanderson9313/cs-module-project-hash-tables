@@ -22,6 +22,7 @@ class HashTable:
 
     def __init__(self, capacity):
         self.capacity = MIN_CAPACITY
+        # check and store
         self.storage = [None for i in range(self.capacity)]
 
 
@@ -158,3 +159,10 @@ if __name__ == "__main__":
         print(ht.get(f"line_{i}"))
 
     print("")
+    
+    htbl = HashTable(8)
+    htbl.put('Lexy', 'Anderson')
+    # print(htbl.storage)
+    # print(htbl.get('Lexy'))
+    # htbl.delete('Lexy')
+    # print(htbl.storage)
