@@ -1,7 +1,18 @@
 def word_count(s):
     # Your code here
-
-
+    frequency = {}
+    ignore = ['"', ':', ';', ',', '.', '-', '+', '=', '/', '\\', '|', '[', ']', '{', '}', '(', ')', '*', '^', '&']
+    
+    clean_string = "".join(ch for ch in s if ch not in ignore)
+    
+    for word in clean_string.lower().split():
+        if word not in frequency:
+            frequency[word] = 1
+        else:
+            frequency[word] += 1
+    
+    return frequency
+            
 
 if __name__ == "__main__":
     print(word_count(""))

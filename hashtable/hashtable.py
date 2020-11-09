@@ -111,7 +111,10 @@ class HashTable:
         else: 
             self.storage[idx] = new_node
             
-        self.load += 1
+        self.load += 1 
+        if self.get_load_factor() > 0.7:
+            self.resize(self.capacity * 2)
+        
         
 
 
@@ -183,22 +186,20 @@ class HashTable:
 
         Implement this.
         """
-        if self.get_load_factor() > 0.7:
-            if new_capacity is None:
-                new_capacity = self.capacity * 2
+        self.capacity = new_capacity
                 
-            old_storage = self.storage
-            self.storage = [None] * new_capacity
+        old_storage = self.storage
+        self.storage = [None] * new_capacity
             
-            for node in old_storage:
-                if node is not None:
-                    self.put(node.key, node.value)
+        for node in old_storage:
+            if node is not None:
+                self.put(node.key, node.value)
                     
-                    curr_node = node
-                    while curr_node.next is not None:
-                        self.put(curr_node.next.key, curr_node.next.value)
+                curr_node = node
+                while curr_node.next is not None:
+                    self.put(curr_node.next.key, curr_node.next.value)
                         
-                        curr_node = curr_node.next
+                    curr_node = curr_node.next
 
 
 
