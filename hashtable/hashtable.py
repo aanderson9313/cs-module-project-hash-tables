@@ -21,7 +21,10 @@ class HashTable:
     """
 
     def __init__(self, capacity):
-        # Your code here
+        self.capacity = MIN_CAPACITY
+        # check and store
+        self.storage = [None for i in range(self.capacity)]
+        self.load = 0
 
 
     def get_num_slots(self):
@@ -34,7 +37,7 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        return self.capacity
 
 
     def get_load_factor(self):
@@ -43,7 +46,9 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        return self.load / self.capacity
+
+        
 
 
     def fnv1(self, key):
@@ -53,7 +58,7 @@ class HashTable:
         Implement this, and/or DJB2.
         """
 
-        # Your code here
+        
 
 
     def djb2(self, key):
@@ -62,7 +67,10 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
-        # Your code here
+        hash = 5381
+        for x in key:
+            hash = (( hash << 5) + hash) + ord(x)
+        return hash
 
 
     def hash_index(self, key):
@@ -70,7 +78,7 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
+        # return self.fnv1(key) % self.capacity
         return self.djb2(key) % self.capacity
 
     def put(self, key, value):
@@ -81,7 +89,33 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        # hash_index = self.djb2(key) % self.capacity
+        # self.storage[hash_index] = value
+        idx = self.hash_index(key)
+        
+        node = self.storage[idx]
+        
+        new_node = HashTableEntry(key, value)
+        
+        if self.storage[idx] != None:
+            if node.key == key:
+                node.value = value
+            else: 
+                while node.next is not None:
+                    if node.next.key == key:
+                        node.next.value = value
+                        break
+                    else: 
+                        node = node.next
+                node.next = new_node
+        else: 
+            self.storage[idx] = new_node
+            
+        self.load += 1 
+        if self.get_load_factor() > 0.7:
+            self.resize(self.capacity * 2)
+        
+        
 
 
     def delete(self, key):
@@ -92,8 +126,31 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
-
+        # hash_index = self.djb2(key) % self.capacity
+        # self.storage[hash_index] = None
+        idx = self.hash_index(key)
+        node = self.storage[idx]
+        
+        if node is None:
+            print(f" The key '{key}' does not exist. ")
+        elif node.key == key:
+            node.key = None
+            self.load -= 1
+        else:
+            prev_node = node
+            curr_node = prev_node.next
+            
+            while curr_node is not None:
+                if curr_node.key == key:
+                    curr_node.key = None
+                    break
+                else: 
+                    prev_node = curr_node
+                    curr_node = curr_node.next
+            self.load -= 1
+            
+        
+        
 
     def get(self, key):
         """
@@ -103,17 +160,46 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        # hash_index = self.djb2(key) % self.capacity
+        # return self.storage[hash_index]
+        idx = self.hash_index(key)
+        node = self.storage[idx]
+        
+        if node is None:
+            print(f" The key '{key}' does not exist. ")
+        else: 
+            while node is not None:
+                #check for target value
+                if node.key == key:
+                    # print(f" | {node.key}, {node.value}")
+                    
+                    return node.value
+                #move to next node
+                else:
+                    node = node.next
 
 
-    def resize(self, new_capacity):
+    def resize(self, new_capacity=None):
         """
         Changes the capacity of the hash table and
         rehashes all key/value pairs.
 
         Implement this.
         """
-        # Your code here
+        self.capacity = new_capacity
+                
+        old_storage = self.storage
+        self.storage = [None] * new_capacity
+            
+        for node in old_storage:
+            if node is not None:
+                self.put(node.key, node.value)
+                    
+                curr_node = node
+                while curr_node.next is not None:
+                    self.put(curr_node.next.key, curr_node.next.value)
+                        
+                    curr_node = curr_node.next
 
 
 
@@ -151,3 +237,10 @@ if __name__ == "__main__":
         print(ht.get(f"line_{i}"))
 
     print("")
+    
+    htbl = HashTable(8)
+    htbl.put('Lexy', 'Anderson')
+    # print(htbl.storage)
+    # print(htbl.get('Lexy'))
+    # htbl.delete('Lexy')
+    # print(htbl.storage)
